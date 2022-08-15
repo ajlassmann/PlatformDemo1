@@ -8,7 +8,9 @@ public class PlayerMovement : MonoBehaviour
     private BoxCollider2D coll;
     private SpriteRenderer sprite;
     private Animator anim;
-
+    private bool MovingLeft;
+    private bool MovingRight;
+    private bool Jumping;
     [SerializeField] private LayerMask jumpableGround;
 
     private float dirX = 0f;
@@ -26,16 +28,45 @@ public class PlayerMovement : MonoBehaviour
         sprite = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
     }
+    public void LButtonDown()
+    {
+        Debug.Log("Button movement engaged.");
+        MovingLeft = true;
+    }
+    public void LButtonUp()
+    {
+        MovingLeft = false;
+    }
+    public void RButtonDown()
+    {
+        MovingRight = true;
+    }
+    public void RButtonUp()
+    {
+        MovingRight = false;
+    }
+    public void JumpButtonDown()
+    {
+        Jumping = true;
+    }
 
     // Update is called once per frame
     private void Update()
     {
-
-        dirX = Input.GetAxisRaw("Horizontal");
+        if (MovingRight || MovingLeft)
+        {
+            Debug.Log("Button movement engaged.");
+            if (MovingRight) dirX = 1.0f;
+            else dirX = -1.0f;
+        }
+        
+        else dirX = Input.GetAxisRaw("Horizontal"); 
+        
         rb.velocity = new Vector2(dirX * moveSpeed, rb.velocity.y);
 
-        if (Input.GetButtonDown("Jump") && IsGrounded())
+        if ((Input.GetButtonDown("Jump") || Jumping) && IsGrounded())
         {
+            Jumping = false;
             jumpSoundEffect.Play();
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         }
